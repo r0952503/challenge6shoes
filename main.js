@@ -99,10 +99,16 @@ gltfLoader.load(
 
         // Apply shadow settings to the model
         model.traverse((child) => {
-            if (child.isMesh) {
-                child.castShadow = true; // Enable shadow casting for the model
-                child.receiveShadow = false; // Model itself won't receive shadows
-            }
+          if (child.isMesh) {
+            child.userData.originalMaterial = child.material; // Store original material
+            child.material = new THREE.MeshStandardMaterial({
+              map: child.material.map,
+              envMap: environmentMap,
+              roughness: 0.4,
+              metalness: 0.2,
+            }); // Set environment map for reflections
+            child.material.needsUpdate = true; // Ensure the material is updated
+          }
         });
 
         scene.add(model);
