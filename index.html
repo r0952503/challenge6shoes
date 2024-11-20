@@ -2,32 +2,28 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css">
-    <title>Vite App</title>
+    <title>3D Sneaker App</title>
   </head>
   <body>
     <div id="sidebar">
-    <h3>Select Part</h3>
-    <ul id="part-list">
-        <li data-part="outside_1">Outside 1</li>
-        <li data-part="outside_2">Outside 2</li>
-        <li data-part="outside_3">Outside 3</li>
-        <li data-part="sole_top">Sole Top</li>
-        <li data-part="sole_bottom">Sole Bottom</li>
-        <li data-part="meshes4">Meshes 4</li>
-        <li data-part="meshes4_1">Meshes 4_1</li>
-        <li data-part="inside">Inside</li>
-        <li data-part="laces">Laces</li>
-    </ul>
-    <h3>Select Color</h3>
-    <div id="color-buttons">
-        <button data-color="#ff0000" style="background-color: #ff0000;">Red</button>
-        <button data-color="#00ff00" style="background-color: #00ff00;">Green</button>
-        <button data-color="#0000ff" style="background-color: #0000ff;">Blue</button>
+      <h3>Select Part</h3>
+      <ul id="part-list">
+        <li data-part="outside_1">Front <span class="color-indicator"></span></li>
+        <li data-part="outside_2">Back<span class="color-indicator"></span></li>
+        <li data-part="outside_3">Front 2<span class="color-indicator"></span></li>
+        <li data-part="sole_top">Sole Top<span class="color-indicator"></span></li>
+        <li data-part="meshes4_1">Sole bottom<span class="color-indicator"></span></li>
+        <li data-part="inside">Inside<span class="color-indicator"></span></li>
+        <li data-part="laces">Laces<span class="color-indicator"></span></li>
+      </ul>
+      <h3>Select Color</h3>
+      <div id="color-picker">
+        <label for="color-input">Pick a Color:</label>
+        <input type="color" id="color-input" value="#ff0000">
+      </div>
     </div>
-</div>
     <script type="module" src="/main.js"></script>
   </body>
 </html>

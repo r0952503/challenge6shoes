@@ -6,11 +6,18 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-renderer.setAnimationLoop( animate );
-document.body.appendChild( renderer.domElement );
 
+
+const renderer = new THREE.WebGLRenderer();
+renderer.setAnimationLoop(animate);
+document.body.appendChild(renderer.domElement);
+renderer.setSize(window.innerWidth - 200, window.innerHeight);
+
+window.addEventListener('resize', () => {
+    renderer.setSize(window.innerWidth - 300, window.innerHeight);
+    camera.aspect = (window.innerWidth - 300) / window.innerHeight;
+    camera.updateProjectionMatrix();
+});
 // Load environment map
 const cubeTextureLoader = new THREE.CubeTextureLoader();
 const environmentMap = cubeTextureLoader.load([
@@ -108,7 +115,7 @@ function animate() {
 
 }
 
-
+// Add event listeners to part list
 // Add event listeners to part list
 document.querySelectorAll('#part-list li').forEach(item => {
   item.addEventListener('click', (event) => {
@@ -117,16 +124,16 @@ document.querySelectorAll('#part-list li').forEach(item => {
   });
 });
 
-// Add event listeners to color buttons
-document.querySelectorAll('#color-buttons button').forEach(button => {
-  button.addEventListener('click', (event) => {
-      const color = event.target.getAttribute('data-color');
-      if (selectedPart) {
-          scene.traverse((child) => {
-              if (child.name === selectedPart) {
-                  child.material = new THREE.MeshStandardMaterial({ color: color });
-              }
-          });
-      }
-  });
+// Add event listener to color picker
+document.getElementById('color-picker').addEventListener('input', (event) => {
+  const color = event.target.value;
+  if (selectedPart) {
+      scene.traverse((child) => {
+          if (child.name === selectedPart) {
+              child.material = new THREE.MeshStandardMaterial({ color: color });
+              // Update the color indicator
+              document.querySelector(`#part-list li[data-part="${selectedPart}"] .color-indicator`).style.backgroundColor = color;
+          }
+      });
+  }
 });
