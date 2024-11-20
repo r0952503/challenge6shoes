@@ -33,6 +33,25 @@ const environmentMap = cubeTextureLoader.load([
 scene.background = environmentMap;
 scene.environment = environmentMap;
 
+
+
+
+// Ambient light
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambientLight);
+
+// Directional light
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+directionalLight.position.set(5, 5, 5);
+directionalLight.castShadow = true;
+scene.add(directionalLight);
+
+// Point light
+const pointLight = new THREE.PointLight(0xffffff, 1);
+pointLight.position.set(0, 2, 0);
+pointLight.castShadow = true;
+scene.add(pointLight);
+
 // dat.GUI setup
 const gui = new dat.GUI();
 const settings = {
@@ -41,20 +60,14 @@ const settings = {
     cameraZoom: 0.5,
 };
 
-// Ambient light
-const ambientLight = new THREE.AmbientLight(0xffffff, settings.lightIntensity);
-scene.add(ambientLight);
-
 // GUI settings
 gui.add(settings, 'lightIntensity', 0, 2).name('Light Intensity').onChange((value) => {
-    ambientLight.intensity = value;
+  ambientLight.intensity = value;
 });
 gui.add(settings, 'modelRotation', 0, Math.PI * 2).name('Model Rotation');
 gui.add(settings, 'cameraZoom', 0.1, 2).name('Camera Zoom').onChange((value) => {
-    camera.position.z = value;
+  camera.position.z = value;
 });
-
-
 
 
 // OrbitControls for interaction
@@ -84,12 +97,11 @@ gltfLoader.load(
     (gltf) => {
         model = gltf.scene;
 
-        // Apply shadow settings to meshes
+        // Apply shadow settings to the model
         model.traverse((child) => {
             if (child.isMesh) {
-                child.castShadow = true;
-                child.receiveShadow = true;
-                child.userData.originalMaterial = child.material; // Store original material
+                child.castShadow = true; // Enable shadow casting for the model
+                child.receiveShadow = false; // Model itself won't receive shadows
             }
         });
 
@@ -101,12 +113,37 @@ gltfLoader.load(
     }
 );
 
+// Handle part selection and color change
+let selectedPart = null;
+document.querySelectorAll('#part-list li').forEach((item) => {
+    item.addEventListener('click', (event) => {
+        document.querySelectorAll('#part-list li').forEach((li) => li.classList.remove('selected'));
+        event.target.classList.add('selected');
+
+        selectedPart = event.target.getAttribute('data-part');
+    });
+});
+
+document.getElementById('color-picker').addEventListener('input', (event) => {
+    const color = event.target.value;
+    if (selectedPart) {
+        scene.traverse((child) => {
+            if (child.name === selectedPart) {
+                child.material = new THREE.MeshStandardMaterial({ color: color });
+                document.querySelector(`#part-list li[data-part="${selectedPart}"] .color-indicator`).style.backgroundColor = color;
+            }
+        });
+    }
+});
+
+
+
 // Animation loop
 function animate() {
-    if (model) {
-        model.rotation.y = settings.modelRotation; // Apply rotation setting
-    }
-    controls.update();
-    renderer.render(scene, camera);
+  if (model) {
+      model.rotation.y = settings.modelRotation; // Apply rotation setting
+  }
+  controls.update();
+  renderer.render(scene, camera);
 }
 renderer.setAnimationLoop(animate);
