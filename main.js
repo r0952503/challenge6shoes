@@ -11,6 +11,21 @@ renderer.setSize( window.innerWidth, window.innerHeight );
 renderer.setAnimationLoop( animate );
 document.body.appendChild( renderer.domElement );
 
+// Load environment map
+const cubeTextureLoader = new THREE.CubeTextureLoader();
+const environmentMap = cubeTextureLoader.load([
+    '/Standardd-Cube-Map/nx.png',
+    '/Standardd-Cube-Map/px.png',
+    '/Standardd-Cube-Map/ny.png',
+    '/Standardd-Cube-Map/py.png',
+    '/Standardd-Cube-Map/nz.png',
+    '/Standardd-Cube-Map/pz.png',
+   
+]);
+
+scene.background = environmentMap;
+scene.environment = environmentMap;
+
 // ambient light
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
 scene.add (ambientLight);
@@ -50,11 +65,32 @@ textureLoader.load('/360.jpg', (texture) => {
 // Load the 3D model
 
 const gltfLoader = new GLTFLoader();
-gltfLoader.load('/shoes/shoe.gltf', (gltf) => {
-    const root = gltf.scene;
-    scene.add(root); // Add the 3D model to the scene
-});
+let laces; // Declare the laces variable
 
+gltfLoader.load(
+  '/shoes/shoe.gltf',
+  (gltf) => {
+    const root = gltf.scene;
+
+    // Traverse the model and log each part
+    root.traverse((child) => {
+      console.log(child.name);
+
+      // Check if the part is the laces
+      if (child.name === 'laces') {
+        laces = child;
+        // Apply a new material with the desired color
+        child.material = new THREE.MeshStandardMaterial({ color: 0xff0000 }); // Red color
+      }
+    });
+
+    scene.add(root);
+  },
+  undefined,
+  (error) => {
+    console.error('An error occurred while loading the GLTF model:', error);
+  }
+);
 
 
 
@@ -71,3 +107,14 @@ function animate() {
 	renderer.render( scene, camera );
 
 }
+
+
+// Add event listeners to color buttons
+document.querySelectorAll('#color-buttons button').forEach(button => {
+  button.addEventListener('click', (event) => {
+      const color = event.target.getAttribute('data-color');
+      if (laces) {
+          laces.material.color.set(color);
+      }
+  });
+});
