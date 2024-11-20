@@ -65,7 +65,9 @@ textureLoader.load('/360.jpg', (texture) => {
 // Load the 3D model
 
 const gltfLoader = new GLTFLoader();
-let laces; // Declare the laces variable
+
+
+let selectedPart = null; // Variable to store the selected part
 
 gltfLoader.load(
   '/shoes/shoe.gltf',
@@ -76,11 +78,9 @@ gltfLoader.load(
     root.traverse((child) => {
       console.log(child.name);
 
-      // Check if the part is the laces
-      if (child.name === 'laces') {
-        laces = child;
-        // Apply a new material with the desired color
-        child.material = new THREE.MeshStandardMaterial({ color: 0xff0000 }); // Red color
+      // Store shoe parts
+      if (child.isMesh) {
+        child.userData.originalMaterial = child.material; // Store original material
       }
     });
 
@@ -103,18 +103,30 @@ camera.position.z = 0.5;
 function animate() {
 
 	
-
+  controls.update(); // Update controls
 	renderer.render( scene, camera );
 
 }
 
 
+// Add event listeners to part list
+document.querySelectorAll('#part-list li').forEach(item => {
+  item.addEventListener('click', (event) => {
+      const partName = event.target.getAttribute('data-part');
+      selectedPart = partName;
+  });
+});
+
 // Add event listeners to color buttons
 document.querySelectorAll('#color-buttons button').forEach(button => {
   button.addEventListener('click', (event) => {
       const color = event.target.getAttribute('data-color');
-      if (laces) {
-          laces.material.color.set(color);
+      if (selectedPart) {
+          scene.traverse((child) => {
+              if (child.name === selectedPart) {
+                  child.material = new THREE.MeshStandardMaterial({ color: color });
+              }
+          });
       }
   });
 });
