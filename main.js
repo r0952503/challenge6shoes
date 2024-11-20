@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import * as dat from 'dat.gui'
+
 
 
 const scene = new THREE.Scene();
@@ -33,6 +35,13 @@ const environmentMap = cubeTextureLoader.load([
 scene.background = environmentMap;
 scene.environment = environmentMap;
 
+
+//dat gui
+const gui = new dat.GUI();
+
+
+
+
 // ambient light
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
 scene.add (ambientLight);
@@ -49,6 +58,8 @@ const pointLight = new THREE.PointLight(0xffffff, 1);
 pointLight.position.set(0, 2, 0);
 pointLight.castShadow.true;
 scene.add(pointLight);
+
+
 
 
 // Add OrbitControls to enable user interaction
@@ -115,10 +126,16 @@ function animate() {
 
 }
 
-// Add event listeners to part list
+
 // Add event listeners to part list
 document.querySelectorAll('#part-list li').forEach(item => {
   item.addEventListener('click', (event) => {
+      // Remove 'selected' class from all items
+      document.querySelectorAll('#part-list li').forEach(li => li.classList.remove('selected'));
+
+      // Add 'selected' class to the clicked item
+      event.target.classList.add('selected');
+
       const partName = event.target.getAttribute('data-part');
       selectedPart = partName;
   });
@@ -135,5 +152,7 @@ document.getElementById('color-picker').addEventListener('input', (event) => {
               document.querySelector(`#part-list li[data-part="${selectedPart}"] .color-indicator`).style.backgroundColor = color;
           }
       });
+
+   
   }
 });
